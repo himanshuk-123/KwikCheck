@@ -1,0 +1,21 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "git.ignoredRepositories": ["node_modules", "android", "ios"],
+  "files.exclude": {
+    "**/node_modules/*": true,
+    "**/android/*": true,
+    "**/ios/*": true,
+    "**/.expo/*": true,
+    "**/dist": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/*": true,
+    "**/android/*": true,
+    "**/ios/*": true
+  },
+  "search.exclude": {
+    "**/node_modules/*": true,
+    "**/android/*": true,
+    "**/ios/*": true
+  }
+}

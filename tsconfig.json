@@ -1,0 +1,15 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "es2022",
+    "jsx": "react-jsx",
+    "paths": {
+      "@src/*": ["src/*"], // Map "@src" alias to the "src" directory
+      "@db": ["src/db/*"],
+      "@assets": ["./src/assets/*"],
+      "@constants": ["./src/constants/index.tsx"],
+      "@contexts": ["./src/contexts/index.tsx"]
+    }
+  }
+}

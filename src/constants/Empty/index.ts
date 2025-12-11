@@ -1,0 +1,86 @@
+import { LeadListStatuswiseRespDataRecord, SingleCardType } from "@src/@types";
+import { ProfileInterface } from "../../@types/UserProfile";
+
+type EMPTY_MY_TASKS_DATA = {
+  data: LeadListStatuswiseRespDataRecord;
+  vehicleType: string;
+};
+
+const EMPTY_MY_TASKS_DATA: EMPTY_MY_TASKS_DATA = {
+  data: {
+    Id: "",
+    CompanyId: "",
+    RegNo: "",
+    ProspectNo: "",
+    CustomerName: "",
+    CustomerMobileNo: "",
+    Vehicle: "",
+    StateId: "",
+    City: "",
+    Area: "",
+    Pincode: "",
+    RcStatus: "",
+    ManufactureDate: new Date(),
+    ChassisNo: "",
+    EngineNo: "",
+    StatusId: "",
+    ExecutiveName: "",
+    ExecutiveMobile: "",
+    ExecutiveReportEmailId: "",
+    AddedById: "",
+    AddedByDate: new Date(),
+    UpdatedById: "",
+    UpdatedByDate: new Date(),
+    VehicleType: "",
+    ClientCityId: "",
+    vehicleCategoryId: "",
+    PaymentStatus: "",
+    ValuatorId: "",
+    VehicleTypeRemarkId: "",
+    VehicleTypeRoleId: "",
+    statename: "",
+    cityname: "",
+    areaname: "",
+    companyname: "",
+    Clientcityname: "",
+    LeadTypeName: "",
+    VehicleTypeValue: "",
+    LeadUId: "",
+    LeadReportId: "",
+    AdminRo: "",
+    ValuatorName: "",
+    YardName: "",
+    LeadRemark: "",
+    QcUpdateDate: "",
+    PriceUpdateDate: "",
+    RetailFeesAmount: "",
+    RepoFeesAmount: "",
+  },
+  vehicleType: "",
+};
+
+const EMPTY_PROFILE_DATA: ProfileInterface = {
+  Amount: "",
+  EMAIL: "",
+  ERROR: "",
+  IP: "",
+  Location: "",
+  MESSAGE: "",
+  MOBILENUMBER: "",
+  OTPCheck: "",
+  PackageName: "",
+  PopStatus: "",
+  ProfileImage: "",
+  RoleId: "",
+  RoleName: "",
+  SHOPNAME: "",
+  STATUSCODE: "",
+  SubRoleId: "",
+  SubRoleName: "",
+  TOKENID: "",
+  USERID: "",
+  Version: "",
+  LoginUserId: "",
+};
+
+export { EMPTY_MY_TASKS_DATA, EMPTY_PROFILE_DATA };

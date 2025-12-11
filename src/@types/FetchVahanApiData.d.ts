@@ -1,0 +1,65 @@
+export interface FetchVahanAPIData {
+    ERROR: string;
+    STATUS: string;
+    MESSAGE: string;
+    RCVahan: RCVahan[];
+}
+
+export interface RCVahan {
+    Id: number;
+    LeadId: string;
+    TypeId: number;
+    CustomerNo: string;
+    OwnerName: string;
+    PresentAddress: string;
+    PermanentAddress: string;
+    Financier: string;
+    Insurer: string;
+    RCRegisterNo: string;
+    RegisterRTOAddress: string;
+    RCRegistrationDate: string;
+    RCOwnerSR: string;
+    VehicleMake: string;
+    color: string;
+    chassinumber: string;
+    Enginenumber: string;
+    VehicleCategory: string;
+    VehicleClassDescription: string;
+    BodyType: string;
+    MobileNo: string;
+    RCFitnessValidity: string;
+    RCTaxValidity: string;
+    InsurancePolicyNumber: string;
+    InsuranceValidity: string;
+    RcStatus: string;
+    Manufacturedate: string;
+    VehicleModel: string;
+    Fuel: string;
+    FuelNorms: string;
+    EngineCubicCapacity: string;
+    NCRBStatus: any;
+    BlackListStatus: string;
+    NOCDetails: string;
+    PermitNo: string;
+    PermitissueDate: string;
+    PermitValidfromdate: string;
+    permitValiduptodate: string;
+    Permittype: string;
+    RCStatusasOn: string;
+    AddedByDate: string;
+    Status: number;
+    RtoCode: string;
+    MakeCompany: string;
+    WheelBase: string;
+    Unladenweight: string;
+    Frossweight: string;
+    NoofCylinder: string;
+    Seatingcapacity: string;
+    SleeperCapacity: string;
+    StandingCapacity: string;
+    Emissionnorms: string;
+    RcFatherName: string;
+    PermitValidFrom: string;
+    PUCCNo: string;
+    PUCCUpto: string;
+}

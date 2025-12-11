@@ -1,0 +1,102 @@
+{
+  "expo": {
+    "name": "KwikCheck",
+    "jsEngine": "hermes",
+    "slug": "kwick-check",
+    "version": "0.1.4",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kwikCheck.app",
+      "jsEngine": "hermes"
+    },
+    "android": {
+      "versionCode": 42,
+      "jsEngine": "hermes",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.ACCESS_WIFI_STATE",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "package": "com.kwikCheck.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow KwikCheck to access your camera",
+          "microphonePermission": "Allow KwikCheck to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-dev-client",
+        {
+          "developmentClient": true
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow KwikCheck to use your location."
+        }
+      ],
+      "react-native-compressor",
+      "expo-asset",
+      "expo-sqlite",
+      "expo-web-browser",
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "69352b51-c596-4b7a-9fce-db3fedf87a43"
+      }
+    },
+    "experiments": {
+      "tsconfigPaths": true,
+      "baseUrl": "/expo-gh-pages"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1b10ef3b-cefa-4357-82a9-6d47bd73bf0f",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
+    "owner": "himanshuk2004"
+  }
+}

@@ -1,0 +1,73 @@
+{
+    "2W": [
+        {
+            "Name in Application": "Odmeter Reading",
+            "Image Sequence": 1,
+            "Questions": [
+                "Enter Odometer Reading",
+                "Check Availability of Key"
+            ],
+            "Answer": "Text Box"
+        },
+        {
+            "Name in Application": "Front Side Image",
+            "Image Sequence": 2,
+            "Questions": "Check Fender/Head Lamp/Front Fork/Break/FRONT SHOCK ABSORBER",
+            "Answer": "Good/Average/Bad/Damaged/Rusted/Missing/Scrap/Excellent"
+        },
+        {
+            "Name in Application": "Right side Image",
+            "Image Sequence": 3,
+            "Questions": "Check Condition of Fuel Tank/Silencer/Handle Bar",
+            "Answer": "Good/Average/Bad/Damaged/Missing/Rusted/Excellent"
+        },
+        {
+            "Name in Application": "Chassis Imprint Image",
+            "Image Sequence": 4,
+            "Questions": [
+                "Check Chassis Number and punching condition"
+            ],
+            "Answer": "Original/Repunched/Damaged/Bent/Missing"
+        },
+        {
+            "Name in Application": "Back Side Image",
+            "Image Sequence": 5,
+            "Questions": "Check Tail lamp/Break/Rear Gaurd/SILENCER COVER/REAR SHOCK ABSORBER",
+            "Answer": "Good/Average/Bad/Damaged/Missing/Excellent/Scrap"
+        },
+        {
+            "Name in Application": "Left Side Image",
+            "Image Sequence": 6,
+            "Questions": "Check Clutch lever/Foot Rest/Gear Pedal",
+            "Answer": "Good/Average/Bad/Damaged/Missing/Rusted/Excellent"
+        },
+        {
+            "Name in Application": "Engine Image",
+            "Image Sequence": 7,
+            "Questions": "Check Engine Function/Clutch Condition/Radiator/Electric Motor",
+            "Answer": "GOOD/AVERAGE/SEIZED/BAD/DISASSEMBLED/RUSTED/MISSING/EXCELLENT"
+        },
+        {
+            "Name in Application": "Front Tyre Image",
+            "Image Sequence": 8,
+            "Questions": "Enter Number of Tyre and check Condition",
+            "Answer": "0%/25%/50%/75%/90%/Missing"
+        },
+        {
+            "Name in Application": "Rear Tyre Image",
+            "Image Sequence": 9,
+            "Questions": "Rear Tyre Life",
+            "Answer": "0%/25%/50%/75%/90%/Missing"
+        },
+        {
+            "Name in Application": "RC Front Image",
+            "Image Sequence": 10,
+            "Questions": "RC Availability",
+            "Answer": "Yes/No"
+        },
+        {
+            "Name in Application": "RC Back Image",
+            "Image Sequence": 11
+        }
+    ]
+}

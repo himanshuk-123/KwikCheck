@@ -1,0 +1,31 @@
+export interface AppStepImageListType {
+  Id?: number;
+  "Odmeter Reading"?: string | null;
+  Chassisplate?: string | null;
+  "Right Side Image"?: string | null;
+  "Chassis Imprint Image"?: string | null;
+  "Back Side Image"?: string | null;
+  "Left Side Image"?: string | null;
+  "Engine Image"?: string | null;
+  "Front Right Tyre Image"?: string | null;
+  "Rear Tyre Image"?: string | null;
+  "Rc Front Image"?: string | null;
+  "Rc Back Image"?: string | null;
+  "Valuator Selfie With Vehicle"?: string | null;
+  Video1?: string | null;
+  Tyre2?: string | null;
+  Tyre4?: string | null;
+  Tyre5?: string | null;
+  Tyre6?: string | null;
+  Tyre7?: string | null;
+  Tyre8?: string | null;
+  Other1?: string | null;
+  Other2?: string | null;
+  Other3?: string | null;
+  Other4?: string | null;
+  Other5?: string | null;
+  "Front Side Image"?: string | null;
+  "Top View Image"?: string | null;
+  Dashboard?: string | null;
+  "Interior Back Side"?: string | null;
+}

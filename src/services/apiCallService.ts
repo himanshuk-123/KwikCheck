@@ -20,11 +20,11 @@ axios.interceptors.request.use(function (request) {
 });
 
 axios.interceptors.response.use(function (response) {
-  console.log();
-  console.log(`==== RESPONSE FROM ${response.request._url} ====`);
-  console.log(JSON.stringify(response.data, null, 2));
-  console.log(`========`);
-  console.log();
+  // console.log();
+  // console.log(`==== RESPONSE FROM ${response.request._url} ====`);
+  // console.log(JSON.stringify(response.data, null, 2));
+  // console.log(`========`);
+  // console.log();
   return response;
 });
 

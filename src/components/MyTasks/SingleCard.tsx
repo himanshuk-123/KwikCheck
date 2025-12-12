@@ -89,7 +89,7 @@ const SingleCard = (props: Props) => {
   });
   const { LeadAppointmentDate } = useApiCall();
   const isRepoCase = props.data.leadType?.toLowerCase() === "repo";
-  console.log("isRepo", isRepoCase);
+  // console.log("isRepo", isRepoCase);
   const HandleOpenDialer = async () => {
     if (!props.data.mobileNumber) {
       ToastAndroid.show(
@@ -117,7 +117,7 @@ const SingleCard = (props: Props) => {
     });
   };
 
-  console.log("item.Vehicle", props.data, isRepoCase);
+  // console.log("item.Vehicle", props.data, isRepoCase);
 
   return (
     <>

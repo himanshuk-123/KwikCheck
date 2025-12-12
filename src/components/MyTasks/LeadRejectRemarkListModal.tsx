@@ -51,7 +51,7 @@ export default function LeadRejectRemarkListModal({
       RemarkMessage: otherRemark.toUpperCase(),
       type,
     };
-    console.log("request to LeadStatusChange", request);
+    // console.log("request to LeadStatusChange", request);
     const leadStatusChanged = await LeadStatusChange(request);
 
     setSelectedAnswer(null);
@@ -87,7 +87,7 @@ export default function LeadRejectRemarkListModal({
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    console.log("CURRENT ITEM", item);
+                    // console.log("CURRENT ITEM", item);
                     if (selectedAnswer?.name !== item.name) {
                       setSelectedAnswer(item);
                     }

@@ -128,11 +128,11 @@ const MyTasksPage = (props: Props) => {
   const vehicleTypeFilter = (item: any) => {
     return (
       item.VehicleType ===
-        // @ts-ignore
-        VEHICLE_TYPE_LIST_MAPPING[selectedVehicleType.toUpperCase()] ||
+      // @ts-ignore
+      VEHICLE_TYPE_LIST_MAPPING[selectedVehicleType.toUpperCase()] ||
       item.VehicleTypeValue ===
-        // @ts-ignore
-        VEHICLE_TYPE_LIST_MAPPING[selectedVehicleType.toUpperCase()]
+      // @ts-ignore
+      VEHICLE_TYPE_LIST_MAPPING[selectedVehicleType.toUpperCase()]
     );
   };
 
@@ -172,7 +172,7 @@ const MyTasksPage = (props: Props) => {
         isBillingAllowed = parseInt(item.AssetBillType) === 2;
         break;
     }
-    console.log("==== isBillingAllowed", isBillingAllowed);
+    //console.log("==== isBillingAllowed", isBillingAllowed);
     return isBillingAllowed;
   };
 
@@ -296,16 +296,16 @@ const MyTasksPage = (props: Props) => {
             </View>
             {myTasks?.filter(searchFilter)?.filter(vehicleTypeFilter).length ==
               0 && (
-              <View style={styles.noDataContainer}>
-                <Text style={styles.noDataText}>No Data Found..</Text>
-              </View>
-            )}
+                <View style={styles.noDataContainer}>
+                  <Text style={styles.noDataText}>No Data Found..</Text>
+                </View>
+              )}
             <View>
               {myTasks
                 ?.filter(searchFilter)
                 ?.filter(vehicleTypeFilter)
                 .map((item, index) => {
-                  console.log("ITEM ------", item);
+                  // console.log("ITEM ------", item);
                   const isRepoCase =
                     item.LeadTypeName?.toLowerCase() === "repo";
 

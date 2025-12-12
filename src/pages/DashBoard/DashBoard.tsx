@@ -116,12 +116,12 @@ const DashBoard = (props: Props) => {
   //     color: COLORS.Dashboard.text.Green,
   //   },
   // ];
-const [data, setData] = useState([
-  { value: 0, color: COLORS.Dashboard.bg.Grey },
-  { value: 0, color: COLORS.Dashboard.text.Orange },
-  { value: 0, color: COLORS.Dashboard.text.Blue },
-  { value: 0, color: COLORS.Dashboard.text.Green },
-]);
+  const [data, setData] = useState([
+    { value: 0, color: COLORS.Dashboard.bg.Grey },
+    { value: 0, color: COLORS.Dashboard.text.Orange },
+    { value: 0, color: COLORS.Dashboard.text.Blue },
+    { value: 0, color: COLORS.Dashboard.text.Green },
+  ]);
   const HandleNavigation = () => {
     pushNavigation("CreateLeads");
   };
@@ -133,33 +133,33 @@ const [data, setData] = useState([
     setRoleId(userCreds.RoleId);
 
     const dashboardCountData = valuatedLeads["response"];
-    console.log("response", response);
-    console.log("dashboardCountData", valuatedLeads);
+    //console.log("response", response);
+    //console.log("dashboardCountData", valuatedLeads);
     setDashBoardData({
       ...dashBoardData,
       ...response[0],
     });
     setValuationData(valuatedLeads["total"]);
     if (response?.[0] && valuatedLeads) {
-    setData([
-      {
-        value: response[0]?.Assignedlead || 0,
-        color: COLORS.Dashboard.bg.Grey,
-      },
-      {
-        value: valuatedLeads.total || 0,
-        color: COLORS.Dashboard.text.Orange,
-      },
-      {
-        value: response[0]?.QCHold || 0,
-        color: COLORS.Dashboard.text.Blue,
-      },
-      {
-        value: response[0]?.CompletedLeads || 0,
-        color: COLORS.Dashboard.text.Green,
-      },
-    ]);
-  }
+      setData([
+        {
+          value: response[0]?.Assignedlead || 0,
+          color: COLORS.Dashboard.bg.Grey,
+        },
+        {
+          value: valuatedLeads.total || 0,
+          color: COLORS.Dashboard.text.Orange,
+        },
+        {
+          value: response[0]?.QCHold || 0,
+          color: COLORS.Dashboard.text.Blue,
+        },
+        {
+          value: response[0]?.CompletedLeads || 0,
+          color: COLORS.Dashboard.text.Green,
+        },
+      ]);
+    }
   };
 
   useFocusEffect(
@@ -182,14 +182,14 @@ const [data, setData] = useState([
         bold
         maxWidth={"80%"}
         color={COLORS.AppTheme.primary}
-        // maxFontSizeMultiplier={2}
+      // maxFontSizeMultiplier={2}
       >
         {dashBoardData["Name"]}
       </Text>
       <Box pt={"$6"} />
 
       <Box style={styles.pieChartContainer} mb={"$5"}>
-        
+
         <PieChart
           data={data}
           radius={60}

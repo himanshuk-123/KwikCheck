@@ -15,13 +15,20 @@ export const GetLeadListStatuswise = async (statusType: LeadListStatusMappingTyp
             body: {
                 Version: process.env.EXPO_API_VERSION || "2",
                 StatusId: LEAD_LIST_STATUS_MAPPING[statusType],
+                PageNumber: 1,
+                PageSize: 20,
             },
         })
 
         if (resp.Error != "0") {
             ToastAndroid.show(resp.MESSAGE || 'Something went wrong', ToastAndroid.LONG);
         }
-
+        console.log("body", {
+            Version: process.env.EXPO_API_VERSION || "2",
+            StatusId: LEAD_LIST_STATUS_MAPPING[statusType],
+            PageNumber: 1,
+            PageSize: 10,
+        });
         return resp?.DataRecord;
     } catch (error) {
         ToastAndroid.show('Something went wrong', ToastAndroid.LONG);

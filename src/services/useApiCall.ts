@@ -36,19 +36,19 @@ const axios = Axios.create({
 });
 
 axios.interceptors.response.use(function (request) {
-  console.log();
-  console.log(`==== REQUEST TO ${request.config.url} ====`);
-  console.log(JSON.stringify(request.data, null, 2));
-  console.log(`========`);
-  console.log();
+  // console.log();
+  // console.log(`==== REQUEST TO ${request.config.url} ====`);
+  // console.log(JSON.stringify(request.data, null, 2));
+  // console.log(`========`);
+  // console.log();
   return request;
 });
 axios.interceptors.response.use(function (response) {
-  console.log();
-  console.log(`==== RESPONSE FROM ${response.request._url} ====`);
-  console.log(JSON.stringify(response.data, null, 2));
-  console.log(`========`);
-  console.log();
+  // console.log();
+  // console.log(`==== RESPONSE FROM ${response.request._url} ====`);
+  // console.log(JSON.stringify(response.data, null, 2));
+  // console.log(`========`);
+  // console.log();
   return response;
 });
 

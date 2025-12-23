@@ -1,19 +1,17 @@
-import { Image as ImageCompressor } from 'react-native-compressor';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
-const processImage = async (uri: string): Promise<string> => {
-  try {
-    const result = await ImageCompressor.compress(uri, {
-      compressionMethod: 'manual', // ❗ auto nahi
-      maxWidth: 1024,              // 🔑 size control
-      quality: 0.55,               // 🔑 below this blur
-      returnableOutputType: 'uri',
-    });
-
-    return result;
-  } catch (error) {
-    console.error("Compression failed:", error);
-    return uri;
-  }
+const processImage = async (imageUri: string): Promise<string> => {
+  const manipResult = await manipulateAsync(
+    imageUri,
+    [
+      { resize: { width: 1024, } },
+      { rotate: -90 },
+    ],
+    { 
+      compress: 0.75,
+      format: SaveFormat.JPEG 
+    }
+  );
+  return manipResult.uri;
 };
-
-export { processImage };
+export {processImage};

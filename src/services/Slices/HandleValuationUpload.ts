@@ -79,9 +79,34 @@ export const HandleValuationUpload = async ({
   }
 
   // 🔍 LOG FILE SIZE BEFORE UPLOAD TO VERIFY COMPRESSION
-
-    
-    
+  let fileSizeKB = "unknown";
+  try {
+    const fileInfo = await FileSystem.getInfoAsync(base64String);
+    if (fileInfo.exists && fileInfo.size) {
+      fileSizeKB = (fileInfo.size / 1024).toFixed(2);
+      const fileSizeBytes = fileInfo.size;
+      console.log(
+        `[HandleValuationUpload] 📁 FILE SIZE: ${fileSizeKB} KB (${fileSizeBytes} bytes)`
+      );
+      
+      // ✅ Expected compressed range: 300-500 KB
+      if (parseFloat(fileSizeKB) > 1000) {
+        console.warn(
+          `⚠️ [HandleValuationUpload] WARNING: Image seems large (${fileSizeKB} KB). ` +
+          `Expected 300-500 KB. Check if compression is working.`
+        );
+      } else if (parseFloat(fileSizeKB) < 100) {
+        console.warn(
+          `⚠️ [HandleValuationUpload] WARNING: Image seems very small (${fileSizeKB} KB). ` +
+          `Expected 300-500 KB. May be corrupted.`
+        );
+      } else {
+        console.log(`✅ [HandleValuationUpload] Image size is in expected range: ${fileSizeKB} KB`);
+      }
+    }
+  } catch (err) {
+    console.warn("[HandleValuationUpload] Could not read file size:", err);
+  }
 
   const formData = new FormData();
 

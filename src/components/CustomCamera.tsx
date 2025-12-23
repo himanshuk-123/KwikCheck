@@ -1,6 +1,8 @@
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
+
 // import { getInfoAsync } from "expo-file-system/legacy";
 import * as FileSystem from "expo-file-system";
 import {
@@ -131,26 +133,50 @@ async function handlePreview() {
   try {
     setIsCameraDisabled(true);
 
-    const data = await CameraRef.current?.takePictureAsync({
-      quality: 0.7,               // ✅ FULL camera quality
-      skipProcessing: false,    // ✅ let camera finish its job
-    });
+const data = await CameraRef.current?.takePictureAsync({
+  quality: 0.6,              // Lower than 1.0
+  skipProcessing: false,      // Faster capture
+});
 
     if (!data?.uri) {
       throw new Error("Camera returned empty URI");
     }
 
     // 🔥 ONE-TIME processing
+    console.log("First part")
     const processedUri = await processImage(data.uri);
-
+console.log("Second part")
     setPreview(processedUri);
+    console.log("Processed Uri: ",processedUri)
+    console.log("Third part")
   } catch (error) {
     console.error("Camera error:", error);
     setIsCameraDisabled(false);
   }
 }
 
+// async function handlePreview() {
+//   try {
+//     // 1. Capture at high quality with processing ENABLED
+//     const data = await CameraRef.current?.takePictureAsync({
+//       quality: 1,            // Start with max quality
+//       skipProcessing: false, // Let the phone's AI clean the image
+//     });
 
+
+// if(data?.uri){
+// proc
+
+//   setPreview(data.uri);
+//       console.log("Handle Preview IMag: ",data?.uri)
+//     } else {
+//       ToastAndroid.show("Failed to capture image.", ToastAndroid.SHORT);
+//     }
+//   } catch (error) {
+//     console.log("Error taking picture: ", error);
+//     ToastAndroid.show("Camera error. Please retry", ToastAndroid.SHORT);
+//   }
+// }
   // ---------- PROCEED ----------
 const handleProceed = async () => {
   if (!preview) return;
@@ -303,7 +329,7 @@ const handleProceed = async () => {
               style={styles.camera}
               facing={facing}
               ref={CameraRef}
-              zoom={0.2}
+              zoom={0}
               focusable
               autofocus={isRefreshing ? "off" : "on"}
               animateShutter

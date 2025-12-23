@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 
 // import { getInfoAsync } from "expo-file-system/legacy";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import {
   Button,
   StyleSheet,
@@ -129,31 +129,30 @@ export default function CustomCamera({
   };
 
   // ---------- CAMERA CAPTURE ----------
-async function handlePreview() {
+ async function handlePreview() {
   try {
     setIsCameraDisabled(true);
 
-const data = await CameraRef.current?.takePictureAsync({
-  quality: 0.6,              // Lower than 1.0
-  skipProcessing: false,      // Faster capture
-});
+    const data = await CameraRef.current?.takePictureAsync({
+      quality: 0.4,
+      skipProcessing: true,
+    });
 
     if (!data?.uri) {
       throw new Error("Camera returned empty URI");
     }
 
-    // 🔥 ONE-TIME processing
-    console.log("First part")
-    const processedUri = await processImage(data.uri);
-console.log("Second part")
-    setPreview(processedUri);
-    console.log("Processed Uri: ",processedUri)
-    console.log("Third part")
+    const info = await FileSystem.getInfoAsync(data.uri);
+    console.log("CAPTURED IMAGE SIZE (KB):", info.size! / 1024);
+
+    setPreview(data.uri);
   } catch (error) {
     console.error("Camera error:", error);
     setIsCameraDisabled(false);
   }
 }
+
+
 
 // async function handlePreview() {
 //   try {
@@ -187,7 +186,8 @@ const handleProceed = async () => {
   try {
     // 1️⃣ Orientation reset (important before leaving camera)
     await resetOrientation();
-
+const info = await FileSystem.getInfoAsync(preview);
+console.log("FINAL IMAGE SIZE in handleProceed (KB):", info.size! / 1024);
     // 2️⃣ Save image locally (processed image)
     const imgPath = await HandleSaveImage({
       uri: preview,
@@ -329,7 +329,7 @@ const handleProceed = async () => {
               style={styles.camera}
               facing={facing}
               ref={CameraRef}
-              zoom={0}
+              // zoom={0.2}
               focusable
               autofocus={isRefreshing ? "off" : "on"}
               animateShutter
@@ -370,7 +370,8 @@ const styles = StyleSheet.create({
   previewImg: {
     flex: 1,
     width: "100%",
-    objectFit: "cover",
+    objectFit: "contain",
+    backgroundColor:"black"
   },
   previewProceedBtn: {
     position: "absolute",

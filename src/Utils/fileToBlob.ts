@@ -1,4 +1,4 @@
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 
 // Assuming `fileUri` is the URI of the video you want to convert to a Blob
 async function convertFileToBlob(fileUri: string) {

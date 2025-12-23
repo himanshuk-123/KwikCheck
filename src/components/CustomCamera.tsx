@@ -1,8 +1,8 @@
-import { AntDesign } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-
+import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { useCallback, useEffect, useRef, useState } from "react";
+// import { getInfoAsync } from "expo-file-system/legacy";
+import * as FileSystem from "expo-file-system";
 import {
   Button,
   StyleSheet,
@@ -10,43 +10,37 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 
-// importing utility functions for saving/removing images
 import {
   HandleSaveImage,
   removePictureToLocalStorage,
 } from "../Utils/imageHandlers";
-import { SideType } from "../@types/RealmSchemaTypes";
+
 import { Image } from "@gluestack-ui/themed";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { TextType } from "@src/@types";
 import { processImage } from "@src/Utils/ProcessImage";
 
-// orientation lock utilities
 import {
   lockOrientationToLandscapeRight,
   resetOrientation,
 } from "@src/Utils/lockOrientation";
 
-// keep screen awake utilities
 import {
   activateKeepAwakeAsync,
   deactivateKeepAwake,
   useKeepAwake,
 } from "expo-keep-awake";
-import { FullPageLoader, handleWithErrorReporting } from "@src/Utils";
 
-import { useAutofocus } from "@src/services/useAutoFocus"; // custom hook for autofocus
+import { FullPageLoader } from "@src/Utils";
+import { useAutofocus } from "@src/services/useAutoFocus";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import AnimatedFocusSquare from "./VideoCamera/AnimatedFocusSquare";
 import { useAppStepList } from "@src/contexts";
-import { useGetLocationAndInsertInDB } from "@src/Utils/getLocationAndInsertInDb";
-
-// to display the loader
-import { ActivityIndicator } from "react-native";
-
 import useZustandStore from "@src/store/useZustandStore";
+import uploadImageWithRetry from "@src/services/uploadWithRetry";
+import * as Location from "expo-location";
 
 export default function CustomCamera({
   id = "",
@@ -60,35 +54,29 @@ export default function CustomCamera({
   vehicleType: string;
 }) {
   const { data } = useAppStepList();
-
   const { setUploadingSide } = useZustandStore.getState();
 
-  const CameraRef = useRef<CameraView>(null); //ref to access the cameraView
+  const CameraRef = useRef<CameraView>(null);
   const navigation = useNavigation();
-  const [facing, setFacing] = useState<CameraType>("back");
-  const [permission, requestPermission] = useCameraPermissions({
-    request: true,
-  });
-  const [preview, setPreview] = useState<string | undefined>("");
-  const [isCameraDisabled, setIsCameraDisabled] = useState(true);
-  const [isInitialLoading, setIsInitialLoading] = useState(true); // loading state
-  const { isRefreshing, focusSquare, onTap } = useAutofocus();
-  const tap = Gesture.Tap().onBegin(onTap); // gesture for tap to focus
-  const { getLocationAndInsertInDB } = useGetLocationAndInsertInDB(); // get image location and insert in DB
 
+  const [facing, setFacing] = useState<CameraType>("back");
+  const [permission, requestPermission] = useCameraPermissions({ request: true });
+  const [preview, setPreview] = useState<string | undefined>();
+  const [isCameraDisabled, setIsCameraDisabled] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isProceeding, setIsProceeding] = useState(false);
 
-  //  keep screen awake during camera open
+  const { isRefreshing, focusSquare, onTap } = useAutofocus();
+  const tap = Gesture.Tap().onBegin(onTap);
+
   useKeepAwake();
 
-  // decide whether to use front/back camera based on side name
   const decideCameraFacing = () => {
     if (side.toLowerCase().includes("selfie")) {
       setFacing("front");
     }
   };
 
-  // for initial orientation and camera facing setup
   useEffect(() => {
     (async () => {
       if (preview) {
@@ -98,43 +86,32 @@ export default function CustomCamera({
       }
     })();
 
-    // reset orientation when leaving camera screen
-    navigation.addListener("blur", (e) => {
-      if (e.target?.includes("Camera-")) resetOrientation();
+    const unsubscribe = navigation.addListener("blur", () => {
+      resetOrientation();
     });
+
     decideCameraFacing();
+    return unsubscribe;
   }, [navigation, preview]);
 
-  // show loader while initializing camera
   useEffect(() => {
-    if (isInitialLoading)
-      FullPageLoader.open({
-        label: "Loading camera...",
-      });
-    else FullPageLoader.close();
+    if (isInitialLoading) {
+      FullPageLoader.open({ label: "Loading camera..." });
+    } else {
+      FullPageLoader.close();
+    }
   }, [isInitialLoading]);
 
-  // keep screen awake using usefocusEffect
   useFocusEffect(
     useCallback(() => {
-      const keepAwake = async () => {
-        await activateKeepAwakeAsync();
-      };
-      keepAwake();
-
-      return () => {
-        deactivateKeepAwake();
-      };
+      activateKeepAwakeAsync();
+      return () => deactivateKeepAwake();
     }, [])
   );
 
-  if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
-  }
+  if (!permission) return <View />;
 
   if (!permission.granted) {
-    // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
         <Text style={{ textAlign: "center" }}>
@@ -145,143 +122,144 @@ export default function CustomCamera({
     );
   }
 
-  function toggleCameraFacing() {
-    setFacing((current) => (current === "back" ? "front" : "back"));
-  }
-
-  // async function takePicture() {
-  // 	try {
-  // 		const data = await Camera.current?.takePictureAsync();
-  // 		if (data) {
-  // 			console.log('DATA hERE: ', id, side);
-  // 			await HandleSaveImage({ uri: data.uri, id, side });
-  // 		}
-  // 		// console.log(data);
-  // 	} catch (error) {
-  // 		console.log(error);
-  // 	}
-  // }
-
-  // check if the current side has a question to show modal later
   const isQuestionForSide = () => {
-    return data.find((item) => item.Name === side).Questions;
+    return data.find((item) => item.Name === side)?.Questions;
   };
 
-  // proceed after taking picture
-  // const handleProceed = async () => {
-  //   if (preview) {
-  //     // setPreview(undefined);
-  //     setIsProceeding(true); // disable the button immediately when clicked
-  //     try {
-  //       const isQuestionToShowModal = !!isQuestionForSide();
+  // ---------- CAMERA CAPTURE ----------
+async function handlePreview() {
+  try {
+    setIsCameraDisabled(true);
 
-  //       if (isDone) {
-  //         await removePictureToLocalStorage(isDone);
-  //       }
-  //       await resetOrientation();
+    const data = await CameraRef.current?.takePictureAsync({
+      quality: 0.7,               // ✅ FULL camera quality
+      skipProcessing: false,    // ✅ let camera finish its job
+    });
 
-  //       if (!isQuestionToShowModal) {
-  //         const updatedImg = await HandleSaveImage({
-  //           uri: preview,
-  //           id,
-  //           side,
-  //           removePreviousImage: Boolean(isDone),
-  //         });
+    if (!data?.uri) {
+      throw new Error("Camera returned empty URI");
+    }
 
-  //         await handleWithErrorReporting(
-  //           async () =>
-  //             await getLocationAndInsertInDB({ imgPath: updatedImg, side })
-  //         );
-  //       }
-  //       // console.log("THIS IS APP STEP LIST -->", !!isQuestionForSide());
-  //       // @ts-ignore
+    // 🔥 ONE-TIME processing
+    const processedUri = await processImage(data.uri);
 
-  //       // navigate to valuation screen after capturing
-  //       navigation.navigate("Valuation", {
-  //         id,
-  //         imgUrl: preview,
-  //         showModal: isQuestionToShowModal,
-  //         side: side,
-  //         vehicleType,
-  //       });
-  //     } catch (error) {
-  //       console.error(error);
-  //       ToastAndroid.show(
-  //         "Something went wrong. Please try again.",
-  //         ToastAndroid.SHORT
-  //       );
-  //     } finally {
-  //       setIsProceeding(false); // re-enable button after the task is done
-  //     }
-  //   }
-  // };
+    setPreview(processedUri);
+  } catch (error) {
+    console.error("Camera error:", error);
+    setIsCameraDisabled(false);
+  }
+}
 
-  const handleProceed = async () => {
-    if (!preview) return; // early exit if no preview available
 
-    const isQuestionToShowModal = !!isQuestionForSide();
-    setUploadingSide(side, true);
+  // ---------- PROCEED ----------
+const handleProceed = async () => {
+  if (!preview) return;
 
-    //  fast navigation to next screen
+  const isQuestionToShowModal = !!isQuestionForSide();
+  setIsProceeding(true);
+
+  try {
+    // 1️⃣ Orientation reset (important before leaving camera)
+    await resetOrientation();
+
+    // 2️⃣ Save image locally (processed image)
+    const imgPath = await HandleSaveImage({
+      uri: preview,
+      id,
+      side,
+      removePreviousImage: Boolean(isDone),
+    });
+
+    if (!imgPath) {
+      throw new Error("Image save failed");
+    }
+
+    // 3️⃣ Navigate IMMEDIATELY (don't wait for upload)
     //@ts-ignore
     navigation.navigate("Valuation", {
       id,
-      imgUrl: preview,
+      imgUrl: imgPath,
       showModal: isQuestionToShowModal,
       side,
       vehicleType,
     });
 
-    if (isDone) {
-      await removePictureToLocalStorage(isDone);
-    }
-
-    await resetOrientation();
-
-    // Background upload with safe error handling
-    setTimeout(() => {
-      handleWithErrorReporting(async () => {
-        const imgPath = await HandleSaveImage({
-          uri: preview,
-          id,
-          side,
-          removePreviousImage: Boolean(isDone),
-        });
-
-        if (!imgPath) {
-          throw new Error("Image saving failed.");
+    // 4️⃣ Continue upload in BACKGROUND
+    setUploadingSide(side, true);
+    
+    (async () => {
+      try {
+        // Get location with proper permission check
+        let location;
+        try {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          
+          if (status !== 'granted') {
+            console.warn("[Location] Permission denied, using fallback (0,0)");
+            location = { coords: { latitude: 0, longitude: 0 } } as any;
+          } else {
+            location = await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.Balanced,
+            });
+            console.log("[Location] Obtained:", {
+              lat: location.coords.latitude,
+              long: location.coords.longitude,
+            });
+          }
+        } catch (err) {
+          console.error("[Location] Error fetching location:", err);
+          location = { coords: { latitude: 0, longitude: 0 } } as any;
         }
 
-        await getLocationAndInsertInDB({ imgPath, side });
-        useZustandStore.getState().setRefreshValuatePage(true);
-        setUploadingSide(side, false);
-      });
-    }, 200);
-    ToastAndroid.show("Uploading image in background...", ToastAndroid.SHORT);
-  };
+        // Get backend paramName
+        const paramName =
+          data.find((item) => item.Name === side)?.Appcolumn || "Other";
 
-  // take picture and save in preview state
-  async function handlePreview() {
-    try {
-      const data = await CameraRef.current?.takePictureAsync({
-        quality: 0.5,
-       skipProcessing: true,
-      });
+        // Get Lead details
+        const myTaskValuate = useZustandStore.getState().myTaskValuate;
+        const LeadId = myTaskValuate?.data?.Id?.toString();
+        const VehicleTypeValue =
+          myTaskValuate?.data?.VehicleTypeValue || vehicleType;
 
-      // const img = await processImage(data?.uri || "");
-      if (data?.uri) {
-        setPreview(data?.uri);
-      } else {
+        if (!LeadId) {
+          throw new Error("LeadId missing");
+        }
+
+        // 🔥 ACTUAL API CALL — IMAGE UPLOAD (WITH RETRY)
+        await uploadImageWithRetry({
+          base64String: imgPath,
+          paramName,
+          LeadId,
+          VehicleTypeValue,
+          geolocation: {
+            lat: location.coords.latitude.toString(),
+            long: location.coords.longitude.toString(),
+            timeStamp: new Date().toISOString(),
+          },
+        });
+
+        ToastAndroid.show("Image uploaded successfully", ToastAndroid.SHORT);
+      } catch (error: any) {
+        console.error("[Background Upload] Failed:", error);
         ToastAndroid.show(
-          "Failed to capture image. Please try again",
-          ToastAndroid.SHORT
+          "Image upload failed. Will retry automatically.",
+          ToastAndroid.LONG
         );
+      } finally {
+        setUploadingSide(side, false);
       }
-    } catch (error) {
-      console.log("Error taking picture : ", error);
-      ToastAndroid.show(" Camera error. Please retry", ToastAndroid.SHORT);
-    }
+    })();
+
+  } catch (error: any) {
+    console.error("handleProceed failed:", error);
+    ToastAndroid.show(
+      "Error saving image. Please retry.",
+      ToastAndroid.LONG
+    );
+  } finally {
+    setIsProceeding(false);
   }
+};
 
   return (
     <GestureDetector gesture={tap}>
@@ -293,19 +271,17 @@ export default function CustomCamera({
               source={{ uri: preview }}
               alt="preview"
             />
+
             <TouchableOpacity
               onPress={async () => {
                 setPreview(undefined);
                 await removePictureToLocalStorage(preview);
               }}
-              style={{
-                position: "absolute",
-                top: 30,
-                right: 10,
-              }}
+              style={{ position: "absolute", top: 30, right: 10 }}
             >
               <AntDesign name="close" size={30} color="black" />
             </TouchableOpacity>
+
             <TouchableOpacity
               onPress={handleProceed}
               disabled={isProceeding}
@@ -324,19 +300,17 @@ export default function CustomCamera({
         ) : (
           <View style={styles.container}>
             <CameraView
-              style={{
-                ...styles.camera,
-              }}
+              style={styles.camera}
               facing={facing}
+              ref={CameraRef}
+              zoom={0.2}
+              focusable
+              autofocus={isRefreshing ? "off" : "on"}
+              animateShutter
               onCameraReady={() => {
                 setIsCameraDisabled(false);
                 setIsInitialLoading(false);
               }}
-              animateShutter
-              autofocus={isRefreshing ? "off" : "on"}
-              focusable
-              zoom={0.3}
-              ref={CameraRef}
             >
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
@@ -348,25 +322,11 @@ export default function CustomCamera({
                     <AntDesign name="camera" size={30} color="white" />
                   </View>
                 </TouchableOpacity>
-                {/* <TouchableOpacity
-								style={styles.button}
-								onPress={() => setIsFlashOn(!isFlashOn)}>
-								<View style={styles.buttonBg}>
-									<MaterialIcons
-										name={
-											isFlashOn
-												? 'flashlight-off'
-												: 'flashlight-on'
-										}
-										size={24}
-										color='white'
-									/>
-								</View>
-							</TouchableOpacity> */}
               </View>
             </CameraView>
           </View>
         )}
+
         {!focusSquare.visible && !preview && (
           <AnimatedFocusSquare focusSquare={focusSquare} />
         )}
@@ -378,29 +338,24 @@ export default function CustomCamera({
 const styles = StyleSheet.create({
   previewContainer: {
     flex: 1,
-    display: "flex",
     gap: 10,
     position: "relative",
   },
   previewImg: {
     flex: 1,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
     width: "100%",
-    objectFit: "contain",
+    objectFit: "cover",
   },
   previewProceedBtn: {
     position: "absolute",
     bottom: 75,
     right: "30%",
     backgroundColor: "#1181B2",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
     width: 150,
     height: 40,
     borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
   container: {
     flex: 1,
@@ -418,24 +373,15 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   button: {
-    // flex: 1,
     alignSelf: "flex-end",
-    alignItems: "flex-end",
     justifyContent: "center",
     height: "100%",
-    // backgroundColor: "red",
   },
   buttonBg: {
     backgroundColor: "blue",
     padding: 10,
     borderRadius: 100,
-    display: "flex",
     justifyContent: "center",
     alignItems: "center",
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
   },
 });

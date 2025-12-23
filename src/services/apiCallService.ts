@@ -42,6 +42,26 @@ interface ApiCallTypeFormData {
   label?: string;
 }
 
+/**
+ * Summarize FormData for console debugging
+ */
+const summarizeFormData = (fd: any) => {
+  try {
+    const parts = fd && Array.isArray((fd as any)._parts) ? (fd as any)._parts : null;
+    if (!parts) return;
+    
+    const summary = parts.map(([key, value]: [string, any]) => {
+      if (typeof value === "string") {
+        return `  ${key}: "${value.substring(0, 40)}..."`;
+      }
+      return `  ${key}: [File] ${value?.name} (${value?.type})`;
+    });
+    console.log("[FormData Parts]\n" + summary.join("\n"));
+  } catch (e) {
+    console.log("[FormData] Unable to summarize:", e);
+  }
+};
+
 const apiCallService = () => {
   const post = async ({
     service,
@@ -95,27 +115,9 @@ const apiCallService = () => {
           label: label,
         });
 
-      // console.log("userCredentials", userCredentials)
-      // const resp = await axios.post(service, body, {
-      // 	headers: {
-      // 		'Content-Type': 'multipart/form-data',
-      // 		"TokenID": "069e5ac1-9308-409f-b78d-7d0d35f3dee5",
-      // 		'accept': '*',
-      // 		...custheaders,
-      // 	},
-      // 	maxBodyLength: Infinity,
-
-      // });
-
-      // const resp = await fetch("https://inspection.kwikcheck.in/" + service, {
-      //   method: "POST",
-      //   body,
-      //   headers: {
-      //     "Content-Type": "multipart/form-data",
-      //     TokenID: userCredentials?.TOKENID || "",
-      //     ...custheaders,
-      //   },
-      // });
+      console.log(`[API] POST multipart to: ${service}`);
+      console.log(`[API] Headers:`, { TokenID: userCredentials?.TOKENID ? "[SET]" : "[MISSING]", ...custheaders });
+      summarizeFormData(body);
 
       const resp = await axios.post(service, body, {
         headers: {
@@ -123,19 +125,23 @@ const apiCallService = () => {
           TokenID: userCredentials?.TOKENID || "",
           ...custheaders,
         },
+        timeout: 30000,
+        maxBodyLength: Infinity,
+        maxContentLength: Infinity,
       });
 
-      // console.log(
-      //   "STATUS:",
-      //   resp.status,
-      //   "\nCONTENT TYPE:",
-      //   resp.headers.get("content-type")
-      // );
-      // console.log("RAW BODY:", await resp.text());
+      console.log(`[API] ✅ Response status: ${resp.status}`);
+      console.log(`[API] Response data:`, resp.data);
 
       return resp;
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.error(`[API] ❌ Error:`, {
+        message: error?.message,
+        code: error?.code,
+        status: error?.response?.status,
+        data: error?.response?.data,
+      });
+      throw error;
     } finally {
       if (label) FullPageLoader.close();
     }

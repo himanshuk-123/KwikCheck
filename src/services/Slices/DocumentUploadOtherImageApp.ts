@@ -3,7 +3,7 @@ import apiCallService from "../apiCallService";
 import { ToastAndroid } from "react-native";
 import { AllApiAcceptedKeys, ApiAcceptedKeys } from "@constants";
 import { HandleValuationUploadType } from "@src/@types/HandleValuationUploadType";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import useZustandStore from "@src/store/useZustandStore";
 import { TYRE_MAPPING } from "@src/constants/DocumentUploadDataMapping";
 

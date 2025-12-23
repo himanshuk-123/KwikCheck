@@ -21,7 +21,7 @@
       "jsEngine": "hermes"
     },
     "android": {
-      "versionCode": 42,
+      "versionCode": 51,
       "jsEngine": "hermes",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -82,7 +82,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "69352b51-c596-4b7a-9fce-db3fedf87a43"
+        "projectId": "327073ff-2640-4b71-b723-c8242ed0b877"
       }
     },
     "experiments": {
@@ -97,6 +97,6 @@
       "checkAutomatically": "ON_LOAD",
       "fallbackToCacheTimeout": 0
     },
-    "owner": "himanshuk2004"
+    "owner": "himanshudev_2004"
   }
 }

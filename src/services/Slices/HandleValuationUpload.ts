@@ -3,7 +3,8 @@ import apiCallService from "../apiCallService";
 import { ToastAndroid } from "react-native";
 import { AllApiAcceptedKeys, ApiAcceptedKeys } from "@constants";
 import { HandleValuationUploadType } from "@src/@types/HandleValuationUploadType";
-import * as FileSystem from "expo-file-system";
+// Use legacy FileSystem API to avoid deprecation warnings in SDK 54
+import * as FileSystem from "expo-file-system/legacy";
 import useZustandStore from "@src/store/useZustandStore";
 import { TYRE_MAPPING } from "@src/constants/DocumentUploadDataMapping";
 
@@ -58,50 +59,86 @@ const decideParameterWithAPI = (key: string, vehicleType: string) => {
 };
 
 export const HandleValuationUpload = async ({
-  base64String = "",
+  base64String, // actually file URI
   paramName = "Other",
   LeadId,
   VehicleTypeValue,
   geolocation,
 }: HandleValuationUploadType) => {
-  const { post, postWithFormData } = apiCallService();
-  // console.log(
-  //   "IN HandleValuationUpload DATA=>",
-  //   base64String,
-  //   paramName,
-  //   LeadId,
-  // );
-  try {
-    const { uri } = await FileSystem.getInfoAsync(base64String);
+  const { postWithFormData } = apiCallService();
 
-    const formData = new FormData();
-    formData.append("LeadId", LeadId);
-    formData.append("Version", "2");
-    formData.append(paramName, `${paramName}.jpg`);
-    formData.append('file1', {
-      type: 'image/jpg',
-      name: `${paramName}.jpg`,
-      uri,
-    } as any);
-    formData.append('Latitude', geolocation.lat);
-    formData.append('Longitude', geolocation.long);
-    formData.append('Timestamp', geolocation.timeStamp);
-
-    // console.log("BASE 64 STR ", formData.getAll(paramName));
-    // console.log("FORMDATA", reqObj);
-    const resp = await postWithFormData({
-      service: `/App/webservice/DocumentUploadOtherImage`,
-      body: formData,
-      headers: {
-        Version: "2",
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    console.log(resp);
-
-  } catch (error) {
-    console.log("Error in HandleValuationUpload", error);
-  } finally {
-    // FullPageLoader.close();
+  // ---- validations ----
+  if (!base64String || !base64String.startsWith("file:")) {
+    throw new Error("Invalid image URI");
   }
+  if (!LeadId) {
+    throw new Error("LeadId missing");
+  }
+  if (!paramName) {
+    throw new Error("paramName missing");
+  }
+
+  // 🔍 LOG FILE SIZE BEFORE UPLOAD TO VERIFY COMPRESSION
+
+    
+    
+
+  const formData = new FormData();
+
+  formData.append("LeadId", LeadId);
+  formData.append("Version", "2");
+
+  // 🔴 REQUIRED by backend (DO NOT REMOVE)
+  // 1️⃣ filename string
+  formData.append(paramName, `${paramName}.jpg`);
+
+  // 2️⃣ actual image file
+  formData.append(paramName, {
+    uri: base64String,
+    name: `${paramName}.jpg`,
+    type: "image/jpeg",
+  } as any);
+
+  formData.append("Latitude", String(geolocation.lat));
+  formData.append("Longitude", String(geolocation.long));
+  formData.append("Timestamp", String(geolocation.timeStamp));
+
+  // ---- debug logs ----
+  if (__DEV__) {
+    console.log("[HandleValuationUpload] REQUEST", {
+      LeadId,
+      paramName,
+      imageUri: base64String,
+      imageSizeKB: fileSizeKB + " KB",
+      lat: geolocation.lat,
+      long: geolocation.long,
+      time: geolocation.timeStamp,
+    });
+  }
+
+  const resp = await postWithFormData({
+    service: "/App/webservice/DocumentUploadOtherImage",
+    body: formData,
+    headers: {
+      Version: "2", // ❗ boundary auto-set by RN
+    },
+  });
+
+  if (__DEV__) {
+    console.log("[HandleValuationUpload] RESPONSE", {
+      status: resp?.status,
+      data: resp?.data,
+    });
+  }
+
+  if (!resp || !resp.status || resp.status < 200 || resp.status >= 300) {
+    throw new Error(`Upload failed with status ${resp?.status}`);
+  }
+
+  const data = resp.data || {};
+  if (data.Error === "1" || data.ERROR === "1") {
+    throw new Error(data.MESSAGE || data.Message || "Server rejected upload");
+  }
+
+  return resp;
 };

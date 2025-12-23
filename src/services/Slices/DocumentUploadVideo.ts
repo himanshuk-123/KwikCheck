@@ -1,6 +1,6 @@
 import { FullPageLoader, LocalStorage } from "@src/Utils";
 import { ToastAndroid } from "react-native";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import axios from "axios";
 
 import { Video } from "react-native-compressor";
